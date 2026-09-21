@@ -15,7 +15,7 @@ export default function Footer() {
               </span>
             </div>
             <p style={{ maxWidth: '38ch' }}>
-              A Malaysian charity founded in 2020. We feed, clothe and care for
+              A Malaysian charity founded in 2020, serving since 2021. We feed, clothe and care for
               the homeless and orphaned — one Ramadhan at a time.
             </p>
             <div className="soc-row">

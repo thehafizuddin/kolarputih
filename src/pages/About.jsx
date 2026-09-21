@@ -34,7 +34,7 @@ export default function About() {
           </Reveal>
           <Reveal className="split-body" delay={120}>
             <span className="kicker">Our Story</span>
-            <h2>Founded in 2020, still showing up.</h2>
+            <h2>Founded in 2020, first served in 2021.</h2>
             <p>
               Kolar Putih is a dedicated organisation that actively organises and takes part in
               charity events every year to support those in need — particularly the homeless and

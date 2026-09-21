@@ -116,7 +116,7 @@ export default function Home() {
             </div>
             <div className="num">
               <Counter to={300} prefix="RM " suffix="K+" /><span>Funds Raised</span>
-              <i>Ringgit raised from donors and sponsors since 2020.</i>
+              <i>Ringgit raised from donors and sponsors since our first event.</i>
             </div>
             <div className="num">
               <Counter to={20} suffix="K+" /><span>Food Provided</span>
