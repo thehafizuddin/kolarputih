@@ -1,12 +1,14 @@
 import { query, one, json, readBody } from './_db.js'
+import { decryptSecret } from './_crypto.js'
 
 /**
  * POST /api/chip-webhook
- * CHIP calls this after a payment settles. We look the purchase up with our
- * own key (never trusting the payload) and mark the donation paid.
+ * CHIP calls this after a payment settles.
  *
- * CHIP does not sign callbacks, so the only trustworthy signal is the
- * server-to-server GET against the gateway using our secret key.
+ * SECURITY: this endpoint is public and unauthenticated, so the request body
+ * is treated as UNTRUSTED. It is only used to learn WHICH purchase to look up.
+ * The authoritative status always comes from a server-to-server GET against
+ * CHIP using our own secret key. If verification fails, nothing is written.
  */
 export default async function handler(req, res) {
   if (req.method !== 'POST') return json(res, 405, { error: 'method_not_allowed' })
@@ -17,8 +19,6 @@ export default async function handler(req, res) {
   const purchaseId = body?.id || body?.purchase_id
   const ref = body?.reference
   if (!purchaseId && !ref) return json(res, 400, { error: 'missing_identifier' })
-
-  const { decryptSecret } = await import('./_crypto.js')
 
   let settings
   try { settings = await one('select * from site_settings where id = 1') }
@@ -31,48 +31,93 @@ export default async function handler(req, res) {
   catch { return json(res, 500, { error: 'key_unreadable' }) }
   if (!secret) return json(res, 500, { error: 'key_missing' })
 
-  // ---- verify with CHIP directly (do not trust the callback body) ------
-  let verified = null
-  if (purchaseId) {
-    try {
-      const r = await fetch(`https://gate.chip-in.asia/api/v1/purchases/${purchaseId}/`, {
-        headers: { Authorization: `Bearer ${secret}` },
-      })
-      if (r.ok) verified = await r.json()
-    } catch (e) {
-      console.error('verify fetch failed:', e.message)
+  // ---- find our donation row -------------------------------------------
+  // Prefer the purchase id (unguessable and tied to us); fall back to the
+  // reference only to locate the row — never to obtain a status.
+  let donation = null
+  try {
+    if (purchaseId) {
+      donation = await one('select * from donations where chip_purchase_id = $1', [purchaseId])
     }
+    if (!donation && ref) {
+      donation = await one('select * from donations where id = $1', [ref])
+    }
+  } catch (e) {
+    console.error('lookup failed:', e.message)
+    return json(res, 500, { error: 'lookup_failed' })
   }
 
-  const status = verified?.status || body?.status
-  const ourRef = verified?.reference || ref
-  const paid = status === 'paid'
+  if (!donation) return json(res, 200, { ok: true, ignored: 'unknown_donation' })
 
-  if (!ourRef) return json(res, 200, { ok: true, ignored: 'no_reference' })
+  // ---- AUTHORITATIVE verification against CHIP -------------------------
+  // We look the purchase up with our own key. The callback body NEVER supplies
+  // the status. No verification -> no write.
+  const lookupId = donation.chip_purchase_id
+  if (!lookupId) {
+    return json(res, 200, { ok: true, ignored: 'no_purchase_on_record' })
+  }
+
+  let verified = null
+  try {
+    const r = await fetch(`https://gate.chip-in.asia/api/v1/purchases/${lookupId}/`, {
+      headers: { Authorization: `Bearer ${secret}` },
+    })
+    if (r.ok) verified = await r.json()
+    else console.error('verify rejected:', r.status, (await r.text()).slice(0, 200))
+  } catch (e) {
+    console.error('verify fetch failed:', e.message)
+  }
+
+  if (!verified) {
+    // Could not confirm with the gateway → do not touch the row.
+    return json(res, 200, { ok: true, ignored: 'unverified' })
+  }
+
+  // Cross-check: the purchase CHIP returned must belong to this donation.
+  if (verified.reference && verified.reference !== String(donation.id)) {
+    console.error('reference mismatch', verified.reference, donation.id)
+    return json(res, 200, { ok: true, ignored: 'reference_mismatch' })
+  }
+
+  // Cross-check the amount so a tampered checkout can't underpay a big pledge.
+  const paidCents = verified.purchase?.total ?? verified.amount
+  if (typeof paidCents === 'number' && paidCents < donation.amount_cents) {
+    console.error('amount mismatch', paidCents, donation.amount_cents)
+    await query(
+      `update donations set status='failed', raw_payload=$2 where id=$1`,
+      [donation.id, JSON.stringify(verified)]
+    )
+    return json(res, 200, { ok: true, ignored: 'amount_mismatch' })
+  }
+
+  const status = verified.status            // <-- from CHIP only
+  const paid = status === 'paid'
 
   try {
     if (paid) {
+      // Never downgrade a paid row.
       await query(
         `update donations
-            set status='paid', paid_at=coalesce(paid_at, now()),
-                chip_purchase_id=coalesce(chip_purchase_id,$2), raw_payload=$3
-          where id=$1`,
-        [ourRef, purchaseId || null, verified ? JSON.stringify(verified) : null]
+            set status='paid',
+                paid_at=coalesce(paid_at, now()),
+                raw_payload=$2
+          where id=$1 and status <> 'paid'`,
+        [donation.id, JSON.stringify(verified)]
       )
-    } else if (status) {
+    } else if (status === 'failed' || status === 'cancelled') {
       await query(
         `update donations
             set status=case when status='paid' then 'paid' else $2 end,
                 raw_payload=$3
           where id=$1`,
-        [ourRef, status === 'failed' ? 'failed' : 'pending',
-         verified ? JSON.stringify(verified) : null]
+        [donation.id, status, JSON.stringify(verified)]
       )
     }
+    // any other status (created/viewed/held) is intentionally ignored
   } catch (e) {
     console.error('webhook update failed:', e.message)
     return json(res, 500, { error: 'update_failed' })
   }
 
-  return json(res, 200, { ok: true, status: status || 'unknown' })
+  return json(res, 200, { ok: true, status })
 }
