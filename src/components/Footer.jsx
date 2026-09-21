@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="foot-grid">
           <div>
             <div className="foot-brand">
-              <img src="/logo.png" alt="Kolar Putih" />
+              <img src="/logo-silver.png" alt="Kolar Putih" />
               <span className="brand-txt">
                 <span className="brand-name">Kolar Putih</span>
                 <span className="brand-sub">Bersatu Demi Masyarakat</span>

@@ -60,7 +60,7 @@ export default function Nav() {
       <header className={`nav ${stuck ? 'stuck' : ''}`}>
         <div className="nav-in">
           <Link to="/" className="brand" aria-label="Kolar Putih home">
-            <img src="/logo.png" alt="Kolar Putih" />
+            <img src="/logo-silver.png" alt="Kolar Putih" />
             <span className="brand-txt">
               <span className="brand-name">Kolar Putih</span>
               <span className="brand-sub">Bersatu Demi Masyarakat</span>
@@ -77,7 +77,7 @@ export default function Nav() {
           </nav>
 
           <div className="nav-cta">
-            <Link to="/contact#donate" className="btn btn-red nav-donate">
+            <Link to="/contact#donate" className="btn btn-chrome nav-donate">
               <span className="ms">volunteer_activism</span> Donate
             </Link>
             <button className="nav-toggle" onClick={() => setOpen(true)} aria-label="Open menu">
@@ -97,7 +97,7 @@ export default function Nav() {
           </Link>
         ))}
         <div className="drawer-foot">
-          <Link to="/contact#donate" className="btn btn-red btn-lg">
+          <Link to="/contact#donate" className="btn btn-chrome btn-lg">
             <span className="ms">volunteer_activism</span> Donate
           </Link>
           <div className="drawer-soc">

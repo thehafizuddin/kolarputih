@@ -91,7 +91,7 @@ export default function Milestone() {
               It is the clearest picture of what Kolar Putih does: ordinary Malaysians giving what
               they can, and our volunteers turning it into something someone can eat tonight.
             </p>
-            <Link to="/contact#donate" className="btn btn-red" style={{ marginTop: 10 }}>
+            <Link to="/contact#donate" className="btn btn-chrome" style={{ marginTop: 10 }}>
               <span className="ms">volunteer_activism</span> Support The Next One
             </Link>
           </Reveal>

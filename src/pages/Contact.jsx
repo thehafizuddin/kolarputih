@@ -100,7 +100,7 @@ export default function Contact() {
                   For sponsorship and corporate partnerships, please include your organisation name
                   and the programme you would like to support.
                 </p>
-                <a className="btn btn-red btn-lg"
+                <a className="btn btn-chrome btn-lg"
                    href="mailto:unitednation.kolarputih@gmail.com?subject=I%20want%20to%20donate%20or%20volunteer">
                   <span className="ms">volunteer_activism</span> Email Us To Donate
                 </a>
@@ -111,7 +111,7 @@ export default function Contact() {
       </section>
 
       {/* ===== FORM ===== */}
-      <section className="sec-off sec">
+      <section className="sec-paper sec">
         <div className="wrap split" style={{ alignItems: 'start' }}>
           <Reveal className="split-body">
             <span className="kicker ghost">Message Us</span>
@@ -121,14 +121,15 @@ export default function Contact() {
               nothing happens, email us directly — we read everything.
             </p>
             <p style={{ marginTop: 22 }}>
-              <strong style={{ color: 'var(--black)' }}>Email</strong><br />
+              <strong style={{ color: 'var(--ink)' }}>Email</strong><br />
               <a href="mailto:unitednation.kolarputih@gmail.com"
-                 style={{ color: 'var(--red)', fontWeight: 600 }}>
+                 style={{ color: 'var(--ink)', fontWeight: 600,
+                          borderBottom: '2px solid var(--silver-dim)' }}>
                 unitednation.kolarputih@gmail.com
               </a>
             </p>
             <p style={{ marginTop: 18 }}>
-              <strong style={{ color: 'var(--black)' }}>Based in</strong><br />
+              <strong style={{ color: 'var(--ink)' }}>Based in</strong><br />
               Cyberjaya, Selangor, Malaysia
             </p>
           </Reveal>

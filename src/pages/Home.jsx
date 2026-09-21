@@ -45,28 +45,28 @@ export default function Home() {
             helping hand can restore dignity to someone living without a home.
           </p>
           <div className="hero-actions">
-            <Link to="/contact#donate" className="btn btn-red btn-lg">
+            <Link to="/contact#donate" className="btn btn-chrome btn-lg">
               <span className="ms">volunteer_activism</span> Donate Now
             </Link>
-            <Link to="/about" className="btn btn-outline-w btn-lg">
+            <Link to="/about" className="btn btn-outline btn-lg">
               Who We Are <span className="ms">arrow_forward</span>
             </Link>
           </div>
           <div className="hero-strip">
             <div className="hero-stat">
-              <b><Counter to={62} suffix="+" /></b>
+              <Counter to={62} suffix="+" />
               <span>People Helped</span>
             </div>
             <div className="hero-stat">
-              <b><span className="cur">RM</span><Counter to={300} suffix="K+" /></b>
+              <Counter to={300} suffix="K+" prefix="RM" prefixClass="cur" />
               <span>Funds Raised</span>
             </div>
             <div className="hero-stat">
-              <b><Counter to={20} suffix="K+" /></b>
+              <Counter to={20} suffix="K+" />
               <span>Food Provided</span>
             </div>
             <div className="hero-stat">
-              <b><Counter to={600} suffix="+" /></b>
+              <Counter to={600} suffix="+" />
               <span>Members</span>
             </div>
           </div>
@@ -136,19 +136,19 @@ export default function Home() {
           </Reveal>
           <div className="ledger">
             <div className="led">
-              <b><Counter to={62} suffix="+" /></b><span>People Helped</span>
+              <Counter to={62} suffix="+" /><span>People Helped</span>
               <i>Individuals reached through our street and shelter programmes.</i>
             </div>
             <div className="led">
-              <b><span className="cur">RM</span><Counter to={300} suffix="K+" /></b><span>Funds Raised</span>
+              <Counter to={300} suffix="K+" prefix="RM" prefixClass="cur" /><span>Funds Raised</span>
               <i>Ringgit raised from donors and sponsors since our first event.</i>
             </div>
             <div className="led">
-              <b><Counter to={20} suffix="K+" /></b><span>Food Provided</span>
+              <Counter to={20} suffix="K+" /><span>Food Provided</span>
               <i>Packed meals and dry goods handed out to those in need.</i>
             </div>
             <div className="led">
-              <b><Counter to={600} suffix="+" /></b><span>Members</span>
+              <Counter to={600} suffix="+" /><span>Members</span>
               <i>Members and volunteers across Selangor, KL, Putrajaya and N. Sembilan.</i>
             </div>
           </div>
@@ -181,7 +181,7 @@ export default function Home() {
       </section>
 
       {/* ===== HOW WE SERVE ===== */}
-      <section className="sec-off sec">
+      <section className="sec-paper sec">
         <div className="wrap">
           <Reveal className="sec-head">
             <span className="kicker ghost">How We Serve</span>
@@ -219,7 +219,7 @@ export default function Home() {
             <Link to="/contact#donate" className="btn btn-white btn-lg">
               <span className="ms">volunteer_activism</span> Donate
             </Link>
-            <Link to="/contact" className="btn btn-outline-w btn-lg">
+            <Link to="/contact" className="btn btn-outline btn-lg">
               <span className="ms">mail</span> Get In Touch
             </Link>
           </Reveal>

@@ -66,7 +66,7 @@ export default function About() {
         </div>
       </section>
 
-      <section className="sec-off sec">
+      <section className="sec-paper sec">
         <div className="wrap">
           <Reveal className="sec-head">
             <span className="kicker ghost">Our Approach</span>
@@ -111,10 +111,10 @@ export default function About() {
       <section className="sec-dark sec-tight">
         <div className="wrap">
           <div className="ledger">
-            <div className="led"><b><Counter to={62} suffix="+" /></b><span>People Helped</span></div>
-            <div className="led"><b><span className="cur">RM</span><Counter to={300} suffix="K+" /></b><span>Funds Raised</span></div>
-            <div className="led"><b><Counter to={20} suffix="K+" /></b><span>Food Provided</span></div>
-            <div className="led"><b><Counter to={600} suffix="+" /></b><span>Members</span></div>
+            <div className="led"><Counter to={62} suffix="+" /><span>People Helped</span></div>
+            <div className="led"><Counter to={300} suffix="K+" prefix="RM" prefixClass="cur" /><span>Funds Raised</span></div>
+            <div className="led"><Counter to={20} suffix="K+" /><span>Food Provided</span></div>
+            <div className="led"><Counter to={600} suffix="+" /><span>Members</span></div>
           </div>
         </div>
       </section>
@@ -129,7 +129,7 @@ export default function About() {
             <Link to="/contact" className="btn btn-white btn-lg">
               <span className="ms">mail</span> Contact Us
             </Link>
-            <Link to="/milestone" className="btn btn-outline-w btn-lg">
+            <Link to="/milestone" className="btn btn-outline btn-lg">
               <span className="ms">history</span> Our Milestone
             </Link>
           </Reveal>
