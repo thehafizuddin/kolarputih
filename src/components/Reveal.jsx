@@ -13,10 +13,13 @@ export function Reveal({ children, className = '', delay = 0 }) {
           io.unobserve(el)
         }
       },
-      { threshold: 0.12, rootMargin: '0px 0px -60px 0px' }
+      { threshold: 0, rootMargin: '0px 0px -40px 0px' }
     )
     io.observe(el)
-    return () => io.disconnect()
+    // Safety net: never leave content invisible just because the observer
+    // did not fire (fast scroll, background tab, JS hiccup).
+    const t = setTimeout(() => el.classList.add('in'), 1200 + delay)
+    return () => { clearTimeout(t); io.disconnect() }
   }, [delay])
   return <div ref={ref} className={`rv ${className}`}>{children}</div>
 }

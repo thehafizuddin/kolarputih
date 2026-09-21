@@ -218,3 +218,59 @@
   .amount-row{grid-template-columns:1fr 1fr}
   .ad-tab{padding:9px 12px;font-size:12.5px}
 }
+
+
+/* ================= CAMPAIGN PAGE ================= */
+.camp-hero{background-size:cover;background-position:center}
+.camp-ends{display:flex;align-items:center;gap:9px;color:var(--silver) !important;
+  font-family:'Oswald',Arial,sans-serif;font-size:14.5px;letter-spacing:.1em;
+  text-transform:uppercase;margin-top:16px !important}
+.camp-ends .ms{font-size:19px}
+
+.camp-layout{display:grid;grid-template-columns:1.5fr 1fr;gap:clamp(28px,4.5vw,64px);
+  align-items:start}
+.camp-main{min-width:0}
+.camp-story{color:var(--muted-dark);font-size:17.5px;line-height:1.75}
+.camp-story p{margin-bottom:20px}
+.camp-story p:last-child{margin-bottom:0}
+.camp-meta{display:flex;align-items:center;gap:11px;color:var(--silver);
+  font-size:15px;margin-top:22px;padding-top:22px;border-top:1px solid var(--steel)}
+.camp-meta .ms{font-size:21px}
+
+.camp-side{position:sticky;top:104px}
+.camp-box{background:var(--graphite-2);border:1px solid var(--steel);
+  border-radius:var(--r);padding:26px 24px;position:relative}
+.camp-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--chrome);border-radius:var(--r) var(--r) 0 0}
+.camp-donate{gap:16px}
+.camp-donate .ad-label:first-child{margin-top:0}
+
+/* progress bar */
+.prog{background:var(--graphite-2);border:1px solid var(--steel);
+  border-radius:var(--r);padding:26px 24px;margin-bottom:34px}
+.prog-nums{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.prog-nums b{font-family:'Oswald',Arial,sans-serif;font-size:clamp(28px,3.4vw,42px);
+  font-weight:600;background:var(--chrome);-webkit-background-clip:text;
+  background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.prog-nums span{font-family:'Oswald',Arial,sans-serif;font-size:14px;
+  letter-spacing:.11em;text-transform:uppercase;color:var(--silver)}
+.prog-of{color:var(--muted-dark) !important}
+.prog-track{height:10px;background:var(--graphite-3);border-radius:100px;overflow:hidden}
+.prog-fill{height:100%;background:var(--chrome);border-radius:100px;
+  transition:width .9s cubic-bezier(.2,0,.2,1)}
+.prog-pct{font-family:'Oswald',Arial,sans-serif;font-size:13px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted-dark);margin-top:11px}
+
+/* icon picker in the editor */
+.icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));
+  gap:8px;margin-top:8px}
+.icon-pick{height:48px;border:1px solid var(--steel);border-radius:var(--r);
+  background:var(--graphite-2);color:var(--muted-dark);display:flex;
+  align-items:center;justify-content:center;transition:all .18s}
+.icon-pick:hover{border-color:var(--silver);color:#fff}
+.icon-pick.on{background:var(--chrome);color:var(--black);border-color:transparent}
+
+@media (max-width:960px){
+  .camp-layout{grid-template-columns:1fr}
+  .camp-side{position:static}
+}

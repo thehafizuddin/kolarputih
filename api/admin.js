@@ -1,5 +1,6 @@
 import { query, one, json, readBody, requireAdmin, adminToken, safeEqual } from './_db.js'
 import { encryptSecret, decryptSecret, maskSecret, hashPassword, verifyPassword } from './_crypto.js'
+import { listCampaigns, saveCampaign, removeCampaign } from './_campaigns.js'
 
 /**
  * /api/admin?action=...
@@ -57,9 +58,7 @@ export default async function handler(req, res) {
 
     if (action === 'overview' && method === 'GET') {
       const summary = await one('select * from donation_summary')
-      const campaigns = await query(
-        'select * from campaigns order by sort_order, title'
-      )
+      const campaigns = await listCampaigns()
       const recent = await query(
         `select id, created_at, donor_name, donor_email, amount_cents, campaign,
                 status, is_anonymous, source
@@ -159,41 +158,23 @@ export default async function handler(req, res) {
     }
 
     if (action === 'campaign' && method === 'POST') {
-      const b = await readBody(req)
-      const title = String(b.title || '').trim().slice(0, 120)
-      if (!title) return json(res, 400, { error: 'title_required' })
-      const slug = (b.slug || title).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50)
-      const goal = b.goal_cents ? Math.max(0, Math.round(Number(b.goal_cents))) : null
-      if (b.id) {
-        await query(
-          `update campaigns set title=$2, slug=$3, blurb=$4, icon=$5,
-                  goal_cents=$6, active=$7, sort_order=$8 where id=$1`,
-          [b.id, title, slug, (b.blurb || '').slice(0, 300) || null,
-           b.icon || 'volunteer_activism', goal,
-           b.active !== false, Number(b.sort_order) || 100]
-        )
-      } else {
-        await query(
-          `insert into campaigns (title, slug, blurb, icon, goal_cents, active, sort_order)
-           values ($1,$2,$3,$4,$5,$6,$7)
-           on conflict (slug) do update set title=excluded.title, blurb=excluded.blurb`,
-          [title, slug, (b.blurb || '').slice(0, 300) || null,
-           b.icon || 'volunteer_activism', goal, b.active !== false, Number(b.sort_order) || 100]
-        )
-      }
-      return json(res, 200, { ok: true, slug })
+      const r = await saveCampaign(await readBody(req))
+      if (r.error) return json(res, 400, r)
+      return json(res, 200, r)
     }
 
     if (action === 'delete-campaign' && method === 'POST') {
-      const b = await readBody(req)
-      if (!b.id) return json(res, 400, { error: 'id_required' })
-      const used = await one('select count(*)::int as n from donations where campaign = (select slug from campaigns where id=$1)', [b.id])
-      if (used?.n > 0) {
-        await query('update campaigns set active=false where id=$1', [b.id])
-        return json(res, 200, { ok: true, deactivated: true, donations: used.n })
-      }
-      await query('delete from campaigns where id=$1 and slug <> $2', [b.id, 'general'])
-      return json(res, 200, { ok: true })
+      const r = await removeCampaign((await readBody(req)).id)
+      if (r.error) return json(res, 400, r)
+      return json(res, 200, r)
+    }
+
+    // full campaign detail for the admin editor
+    if (action === 'campaign-detail' && method === 'GET') {
+      const slug = (req.query?.slug || '').toString()
+      const c = await one('select * from campaigns where slug = $1 or id::text = $1', [slug])
+      if (!c) return json(res, 404, { error: 'not_found' })
+      return json(res, 200, { campaign: c })
     }
 
     if (action === 'manual' && method === 'POST') {

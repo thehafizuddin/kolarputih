@@ -411,6 +411,8 @@ h3{font-size:clamp(20px,2.2vw,26px)}
 .rv{opacity:0;transform:translateY(24px);
   transition:opacity .65s ease, transform .65s cubic-bezier(.2,0,.2,1)}
 .rv.in{opacity:1;transform:none}
+/* if the observer never runs, content must still be readable */
+@media (scripting: none){.rv{opacity:1;transform:none}}
 
 /* ===== RESPONSIVE ===== */
 @media (max-width:1040px){

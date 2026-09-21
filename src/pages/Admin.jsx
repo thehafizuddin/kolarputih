@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import CampaignEditor from './CampaignEditor'
 
 const API = '/api/admin'
 
@@ -143,7 +144,7 @@ function Dashboard({ token, onLogout }) {
         </div>
         <nav className="ad-tabs">
           {[['donations', 'Donations'], ['gateway', 'Payment Gateway'],
-            ['campaigns', 'Categories'], ['manual', 'Add Offline']].map(([k, l]) => (
+            ['campaigns', 'Campaigns'], ['manual', 'Add Offline']].map(([k, l]) => (
             <button key={k} className={`ad-tab ${tab === k ? 'on' : ''}`} onClick={() => setTab(k)}>{l}</button>
           ))}
         </nav>
@@ -163,7 +164,10 @@ function Dashboard({ token, onLogout }) {
 
       {tab === 'donations' && <Donations token={token} onAuth={onLogout} />}
       {tab === 'gateway' && <Gateway token={token} data={g} onSaved={() => { load(); say('Saved.') }} />}
-      {tab === 'campaigns' && <Campaigns token={token} campaigns={data.campaigns} onChanged={() => { load(); say('Updated.') }} />}
+      {tab === 'campaigns' && (
+        <CampaignEditor token={token} campaigns={data.campaigns}
+          onChanged={load} onNotify={say} />
+      )}
       {tab === 'manual' && <Manual token={token} campaigns={data.campaigns} onAdded={() => { load(); say('Donation recorded.') }} />}
     </div>
   )
@@ -346,93 +350,6 @@ function Gateway({ token, data, onSaved }) {
           <li>In CHIP, set the webhook URL to <code>{typeof window !== 'undefined' ? window.location.origin : ''}/api/chip-webhook</code></li>
         </ol>
       </details>
-    </section>
-  )
-}
-
-/* =====================  CAMPAIGNS  ===================== */
-function Campaigns({ token, campaigns, onChanged }) {
-  const [form, setForm] = useState({ title: '', blurb: '', goal: '', icon: 'volunteer_activism' })
-  const [err, setErr] = useState('')
-
-  const add = async () => {
-    setErr('')
-    if (!form.title.trim()) return setErr('Title is required.')
-    try {
-      await call('campaign', {
-        method: 'POST', token,
-        body: {
-          title: form.title, blurb: form.blurb, icon: form.icon,
-          goal_cents: form.goal ? Math.round(Number(form.goal) * 100) : null,
-        },
-      })
-      setForm({ title: '', blurb: '', goal: '', icon: 'volunteer_activism' })
-      onChanged()
-    } catch (e) { setErr(e.message) }
-  }
-
-  const toggle = async (c) => {
-    await call('campaign', {
-      method: 'POST', token,
-      body: { id: c.id, title: c.title, slug: c.slug, blurb: c.blurb, icon: c.icon,
-              goal_cents: c.goal_cents, active: !c.active, sort_order: c.sort_order },
-    })
-    onChanged()
-  }
-
-  const remove = async (c) => {
-    if (!confirm(`Remove “${c.title}”?`)) return
-    await call('delete-campaign', { method: 'POST', token, body: { id: c.id } })
-    onChanged()
-  }
-
-  return (
-    <section className="ad-card">
-      <h2 className="ad-h2">Donation Categories</h2>
-      <p className="ad-note">These appear as the giving options on the public donate form.</p>
-
-      <div className="ad-scroll">
-        <table className="ad-table">
-          <thead><tr><th>Order</th><th>Title</th><th>Slug</th><th>Goal</th><th>Status</th><th></th></tr></thead>
-          <tbody>
-            {campaigns.map((c) => (
-              <tr key={c.id}>
-                <td className="ad-dim">{c.sort_order}</td>
-                <td><b>{c.title}</b><span className="ad-dim ad-block">{c.blurb || ''}</span></td>
-                <td className="ad-dim">{c.slug}</td>
-                <td>{c.goal_cents ? rupiah(c.goal_cents) : '—'}</td>
-                <td><span className={`ad-pill ${c.active ? 'paid' : 'failed'}`}>{c.active ? 'active' : 'hidden'}</span></td>
-                <td className="ad-rowacts">
-                  <button className="ad-btn ad-btn-mini" onClick={() => toggle(c)}>{c.active ? 'Hide' : 'Show'}</button>
-                  {c.slug !== 'general' &&
-                    <button className="ad-btn ad-btn-mini danger" onClick={() => remove(c)}>Delete</button>}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <h3 className="ad-h3">Add a category</h3>
-      <div className="ad-grid2">
-        <div>
-          <label className="ad-label">Title</label>
-          <input className="ad-input" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })}
-                 placeholder="e.g. Winter Clothing Drive" />
-        </div>
-        <div>
-          <label className="ad-label">Goal (RM, optional)</label>
-          <input className="ad-input" type="number" min="0" step="10" value={form.goal}
-                 onChange={(e) => setForm({ ...form, goal: e.target.value })} placeholder="5000" />
-        </div>
-      </div>
-      <label className="ad-label">Short description</label>
-      <input className="ad-input" value={form.blurb} onChange={(e) => setForm({ ...form, blurb: e.target.value })}
-             placeholder="One line shown under the category" />
-      {err && <div className="ad-err">{err}</div>}
-      <div className="ad-actions">
-        <button className="ad-btn ad-btn-primary" onClick={add}>Add Category</button>
-      </div>
     </section>
   )
 }

@@ -117,6 +117,12 @@ function PublicDonate() {
               </button>
             ))}
           </div>
+          <p className="note" style={{ marginTop: 12 }}>
+            Want the full story and progress for one of these?{' '}
+            <Link to={`/c/${campaign}`} style={{ color: 'var(--silver-lit)', textDecoration: 'underline' }}>
+              Open the campaign page
+            </Link>
+          </p>
         </div>
       )}
 

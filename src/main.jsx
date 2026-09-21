@@ -11,6 +11,7 @@ import Milestone from './pages/Milestone'
 import Contact from './pages/Contact'
 import Admin from './pages/Admin'
 import PublicDonate, { ThankYou } from './pages/Donate'
+import Campaign from './pages/Campaign'
 
 function ScrollTop() {
   const { pathname } = useLocation()
@@ -31,6 +32,7 @@ function Shell() {
         <Route path="/milestone" element={<Milestone />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/donate" element={<PublicDonate />} />
+        <Route path="/c/:slug" element={<Campaign />} />
         <Route path="/thank-you" element={<ThankYou />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<Home />} />
