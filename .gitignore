@@ -8,3 +8,9 @@ dist
 .pwenv
 shoot.py
 optimize.py
+.secenv
+set_gh_secret.py
+set_secrets.sh
+vdeploy.py
+livetest.py
+dbg.py
