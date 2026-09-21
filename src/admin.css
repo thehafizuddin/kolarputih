@@ -274,3 +274,100 @@
   .camp-layout{grid-template-columns:1fr}
   .camp-side{position:static}
 }
+
+
+/* ================= CAMPAIGN COLLAGE ================= */
+.collage{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+}
+/* adapt to how many campaigns exist, so the row always fills */
+.collage[data-count="1"]{grid-template-columns:minmax(0,620px)}
+.collage[data-count="2"]{grid-template-columns:repeat(2,minmax(0,1fr))}
+.collage[data-count="3"]{grid-template-columns:repeat(3,minmax(0,1fr))}
+/* keep the media band a consistent height regardless of column width */
+.collage[data-count="1"] .ccard-media,
+.collage[data-count="2"] .ccard-media,
+.collage[data-count="3"] .ccard-media{aspect-ratio:auto;height:210px}
+.collage[data-count="1"] .ccard-body,
+.collage[data-count="2"] .ccard-body,
+.collage[data-count="3"] .ccard-body{min-height:0}
+/* first card spans two columns and two rows when there is enough to fill */
+.collage-lead{grid-column:span 2;grid-row:span 2}
+.collage-lead .ccard{height:100%}
+.collage-lead .ccard-media{aspect-ratio:auto;height:100%;min-height:320px}
+.collage-lead .ccard{display:grid;grid-template-columns:1fr;grid-template-rows:1.25fr 1fr}
+.collage-lead .ccard h3{font-size:clamp(22px,2.4vw,30px)}
+.collage-lead .ccard p{font-size:16px}
+
+.collage-more{display:flex;justify-content:center;margin-top:40px}
+.collage-dim{opacity:.62}
+.collage-dim:hover{opacity:1;transition:opacity .3s ease}
+
+.ccard{
+  display:flex;flex-direction:column;height:100%;
+  background:var(--graphite-2);border:1px solid var(--steel);
+  border-radius:var(--r);overflow:hidden;
+  transition:transform .25s cubic-bezier(.2,0,.2,1), border-color .25s ease,
+             box-shadow .25s ease;
+}
+.ccard:hover{transform:translateY(-6px);border-color:rgba(200,205,210,.4);
+  box-shadow:0 24px 50px rgba(0,0,0,.55)}
+.ccard:hover .ccard-media img{transform:scale(1.06)}
+
+.ccard-media{position:relative;overflow:hidden;aspect-ratio:16/10;background:var(--graphite-3)}
+.ccard-media img{width:100%;height:100%;object-fit:cover;
+  transition:transform .6s cubic-bezier(.2,0,.2,1)}
+.ccard-blank{width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--graphite-3),var(--steel))}
+.ccard-blank .ms{font-size:54px;color:var(--silver-dim);opacity:.55}
+.ccard-flag{position:absolute;top:12px;left:12px;background:var(--chrome);color:var(--black);
+  font-family:'Oswald',Arial,sans-serif;font-size:10.5px;font-weight:600;
+  letter-spacing:.13em;text-transform:uppercase;padding:5px 10px;border-radius:var(--r)}
+.ccard-closed{position:absolute;top:12px;left:12px;background:rgba(11,12,13,.9);
+  color:var(--silver);border:1px solid var(--steel);
+  font-family:'Oswald',Arial,sans-serif;font-size:10.5px;font-weight:600;
+  letter-spacing:.13em;text-transform:uppercase;padding:5px 10px;border-radius:var(--r)}
+
+.ccard-body{display:flex;flex-direction:column;flex:1;padding:22px 20px 20px;position:relative}
+.ccard-icon{position:absolute;top:-26px;right:16px;width:50px;height:50px;
+  background:var(--chrome);color:var(--black);border-radius:var(--r);
+  display:flex;align-items:center;justify-content:center;font-size:24px;
+  box-shadow:0 8px 22px rgba(0,0,0,.5), 0 0 0 4px var(--graphite-2)}
+.ccard h3{font-size:19px;margin-bottom:9px;color:#fff;padding-right:52px}
+.ccard p{font-size:14.5px;color:var(--muted-dark);line-height:1.55;
+  margin-bottom:auto;display:-webkit-box;-webkit-line-clamp:3;
+  -webkit-box-orient:vertical;overflow:hidden}
+
+.ccard-prog{margin-top:18px}
+.prog-track.slim{height:6px;margin-bottom:9px}
+.ccard-nums{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.ccard-nums span{font-family:'Oswald',Arial,sans-serif;font-size:12.5px;
+  letter-spacing:.05em;color:var(--muted-dark);text-transform:uppercase}
+.ccard-nums b{color:var(--silver-lit);font-weight:600}
+.ccard-pct{color:var(--silver) !important;font-weight:600}
+
+.ccard-foot{display:flex;align-items:center;justify-content:space-between;
+  gap:10px;margin-top:18px;padding-top:16px;border-top:1px solid var(--steel)}
+.ccard-end{display:flex;align-items:center;gap:6px;font-size:12.5px;
+  color:var(--muted-dark);font-family:'Oswald',Arial,sans-serif;
+  letter-spacing:.06em;text-transform:uppercase}
+.ccard-end .ms{font-size:15px}
+.ccard-go{display:flex;align-items:center;gap:5px;font-family:'Oswald',Arial,sans-serif;
+  font-size:13px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--silver);margin-left:auto;transition:gap .2s ease}
+.ccard:hover .ccard-go{gap:10px;color:#fff}
+.ccard-go .ms{font-size:17px}
+
+@media (max-width:1040px){
+  .collage{grid-template-columns:repeat(2,1fr)}
+  .collage-lead{grid-column:span 2;grid-row:auto}
+  .collage-lead .ccard{display:flex}
+  .collage-lead .ccard-media{aspect-ratio:16/9;min-height:0;height:auto}
+}
+@media (max-width:620px){
+  .collage{grid-template-columns:1fr;gap:14px}
+  .collage-lead{grid-column:span 1}
+  .ccard h3{padding-right:48px}
+}

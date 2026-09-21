@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Reveal, Counter } from '../components/Reveal'
+import { CampaignCollage } from '../components/CampaignCollage'
 
 const PILLARS = [
   { icon: 'restaurant', title: 'Supporting The Homeless',
@@ -125,6 +126,9 @@ export default function Home() {
           <figcaption>Packing Night</figcaption>
         </figure>
       </section>
+
+      {/* ===== OPEN APPEALS (collage) ===== */}
+      <CampaignCollage limit={4} />
 
       {/* ===== NUMBERS ===== */}
       <section className="sec-dark sec-tight">
