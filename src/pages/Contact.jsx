@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { Reveal } from '../components/Reveal'
 
 const SUBJECTS = ['General enquiry', 'Donation', 'Volunteering', 'Sponsorship / partnership', 'Media & press']
@@ -100,10 +100,15 @@ export default function Contact() {
                   For sponsorship and corporate partnerships, please include your organisation name
                   and the programme you would like to support.
                 </p>
-                <a className="btn btn-chrome btn-lg"
-                   href="mailto:unitednation.kolarputih@gmail.com?subject=I%20want%20to%20donate%20or%20volunteer">
-                  <span className="ms">volunteer_activism</span> Email Us To Donate
-                </a>
+                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                  <Link to="/donate" className="btn btn-chrome btn-lg">
+                    <span className="ms">volunteer_activism</span> Donate Online
+                  </Link>
+                  <a className="btn btn-outline btn-lg"
+                     href="mailto:unitednation.kolarputih@gmail.com?subject=I%20want%20to%20volunteer">
+                    <span className="ms">mail</span> Volunteer Instead
+                  </a>
+                </div>
               </div>
             </div>
           </Reveal>

@@ -77,7 +77,7 @@ export default function Nav() {
           </nav>
 
           <div className="nav-cta">
-            <Link to="/contact#donate" className="btn btn-chrome nav-donate">
+            <Link to="/donate" className="btn btn-chrome nav-donate">
               <span className="ms">volunteer_activism</span> Donate
             </Link>
             <button className="nav-toggle" onClick={() => setOpen(true)} aria-label="Open menu">
@@ -97,7 +97,7 @@ export default function Nav() {
           </Link>
         ))}
         <div className="drawer-foot">
-          <Link to="/contact#donate" className="btn btn-chrome btn-lg">
+          <Link to="/donate" className="btn btn-chrome btn-lg">
             <span className="ms">volunteer_activism</span> Donate
           </Link>
           <div className="drawer-soc">

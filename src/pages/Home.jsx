@@ -45,7 +45,7 @@ export default function Home() {
             helping hand can restore dignity to someone living without a home.
           </p>
           <div className="hero-actions">
-            <Link to="/contact#donate" className="btn btn-chrome btn-lg">
+            <Link to="/donate" className="btn btn-chrome btn-lg">
               <span className="ms">volunteer_activism</span> Donate Now
             </Link>
             <Link to="/about" className="btn btn-outline btn-lg">
@@ -216,7 +216,7 @@ export default function Home() {
             </p>
           </Reveal>
           <Reveal className="cta-btns" delay={120}>
-            <Link to="/contact#donate" className="btn btn-white btn-lg">
+            <Link to="/donate" className="btn btn-white btn-lg">
               <span className="ms">volunteer_activism</span> Donate
             </Link>
             <Link to="/contact" className="btn btn-outline btn-lg">

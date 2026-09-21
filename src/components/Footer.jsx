@@ -43,7 +43,7 @@ export default function Footer() {
             <ul>
               <li>Cyberjaya, Selangor</li>
               <li><a href="mailto:unitednation.kolarputih@gmail.com">unitednation.kolarputih@gmail.com</a></li>
-              <li><Link to="/contact#donate">Donate / Volunteer</Link></li>
+              <li><Link to="/donate">Donate / Volunteer</Link></li>
             </ul>
           </div>
         </div>
