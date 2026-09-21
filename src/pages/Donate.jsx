@@ -15,10 +15,15 @@ function PublicDonate() {
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState('')
 
+  const [gatewayOpen, setGatewayOpen] = useState(null)   // null = unknown
+
   useEffect(() => {
     fetch('/api/campaigns')
       .then((r) => r.json())
-      .then((d) => { if (d.campaigns?.length) setCampaigns(d.campaigns) })
+      .then((d) => {
+        if (d.campaigns?.length) setCampaigns(d.campaigns)
+        setGatewayOpen(d.gateway_open !== false)
+      })
       .catch(() => {})
   }, [])
 
@@ -118,9 +123,11 @@ function PublicDonate() {
       {/* ---- details ---- */}
       <div className="ad-grid2">
         <div>
-          <label className="ad-label">Full name</label>
+          <label className="ad-label">Full name{f.anonymous ? ' (not needed)' : ''}</label>
           <input className="ad-input" value={f.name} disabled={f.anonymous}
-                 onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="Your name" />
+                 required={!f.anonymous}
+                 onChange={(e) => setF({ ...f, name: e.target.value })}
+                 placeholder="Your full name" />
         </div>
         <div>
           <label className="ad-label">Email</label>
@@ -131,8 +138,9 @@ function PublicDonate() {
 
       <div>
         <label className="ad-label">Phone (optional)</label>
-        <input className="ad-input" value={f.phone}
-               onChange={(e) => setF({ ...f, phone: e.target.value })} placeholder="+60…" />
+        <input className="ad-input" value={f.phone} type="tel" inputMode="tel"
+               onChange={(e) => setF({ ...f, phone: e.target.value })}
+               placeholder="0123456789" />
       </div>
 
       <div>
@@ -148,11 +156,23 @@ function PublicDonate() {
         Donate anonymously — hide my name from the record
       </label>
 
+      {gatewayOpen === false && (
+        <div className="ad-warn">
+          <b>Online donations are not open yet.</b> We are finishing our payment setup.
+          In the meantime, email us at{' '}
+          <a href="mailto:unitednation.kolarputih@gmail.com">unitednation.kolarputih@gmail.com</a>{' '}
+          and we will arrange your donation directly.
+        </div>
+      )}
+
       {err && <div className="ad-err">{err}</div>}
 
-      <button type="submit" className="ad-btn ad-btn-primary" disabled={busy}
+      <button type="submit" className="ad-btn ad-btn-primary"
+              disabled={busy || gatewayOpen === false}
               style={{ padding: '19px 30px', fontSize: 16 }}>
-        {busy ? 'Redirecting…' : `Donate RM${finalAmount > 0 ? finalAmount : '—'} Securely`}
+        {gatewayOpen === false
+          ? 'Donations Opening Soon'
+          : busy ? 'Redirecting…' : `Donate RM${finalAmount > 0 ? finalAmount : '—'} Securely`}
       </button>
 
       <p className="note" style={{ textAlign: 'center' }}>

@@ -16,7 +16,18 @@ export default async function handler(req, res) {
 
   const name = String(body.name || '').trim().slice(0, 120)
   const email = String(body.email || '').trim().slice(0, 160)
-  const phone = String(body.phone || '').trim().slice(0, 40)
+  // normalise the phone: strip separators, require a plausible MY number
+  let phone = String(body.phone || '').trim().replace(/[\s\-()]/g, '')
+  if (phone) {
+    if (phone.startsWith('+')) phone = phone.slice(1)
+    if (phone.startsWith('0')) phone = '6' + phone
+    if (!/^60\d{8,11}$/.test(phone)) {
+      return json(res, 400, {
+        error: 'invalid_phone',
+        message: 'Please enter a valid Malaysian phone number, e.g. 0123456789.',
+      })
+    }
+  }
   const campaign = String(body.campaign || 'general').trim().slice(0, 60)
   const message = String(body.message || '').trim().slice(0, 500)
   const anonymous = Boolean(body.anonymous)
@@ -24,6 +35,12 @@ export default async function handler(req, res) {
 
   if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
     return json(res, 400, { error: 'invalid_email', message: 'Please enter a valid email address.' })
+  }
+  if (!anonymous && name.length < 2) {
+    return json(res, 400, {
+      error: 'name_required',
+      message: 'Please enter your name, or tick the anonymous box.',
+    })
   }
   if (!Number.isFinite(amount) || amount < 1 || amount > 100000) {
     return json(res, 400, { error: 'invalid_amount', message: 'Amount must be between RM1 and RM100,000.' })
