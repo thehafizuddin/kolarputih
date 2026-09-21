@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Reveal } from '../components/Reveal'
+import { SOCIALS, CONTACT, SocialIcon } from '../socials'
 
 const SUBJECTS = ['General enquiry', 'Donation', 'Volunteering', 'Sponsorship / partnership', 'Media & press']
 
@@ -24,7 +25,7 @@ export default function Contact() {
       `Name: ${form.name}\nEmail: ${form.email}\nSubject: ${form.subject}\n\n${form.message}`
     )
     window.location.href =
-      `mailto:unitednation.kolarputih@gmail.com` +
+      `mailto:${CONTACT.email}` +
       `?subject=${encodeURIComponent(`[Kolar Putih] ${form.subject}`)}&body=${body}`
     setSent(true)
   }
@@ -49,24 +50,29 @@ export default function Contact() {
               <div className="info-item">
                 <span className="ms">location_on</span>
                 <h4>Based In</h4>
-                <p>Cyberjaya, Selangor<br />Malaysia</p>
+                <p>{CONTACT.location}<br />Malaysia</p>
               </div>
             </Reveal>
             <Reveal delay={100}>
               <div className="info-item">
                 <span className="ms">mail</span>
                 <h4>Email</h4>
-                <p><a href="mailto:unitednation.kolarputih@gmail.com">unitednation.kolarputih@gmail.com</a></p>
+                <p><a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a></p>
               </div>
             </Reveal>
             <Reveal delay={200}>
               <div className="info-item">
                 <span className="ms">public</span>
                 <h4>Follow Us</h4>
-                <p>
-                  <a href="https://www.instagram.com/kolarputihofficial" target="_blank" rel="noreferrer">@kolarputihofficial</a><br />
-                  <a href="https://www.facebook.com/profile.php?id=61557827740619" target="_blank" rel="noreferrer">Kolar Putih on Facebook</a>
-                </p>
+                <div className="contact-socials">
+                  {SOCIALS.map((s) => (
+                    <a key={s.key} href={s.url} target="_blank" rel="noreferrer" className="contact-soc">
+                      <SocialIcon name={s.key} size={17} />
+                      <span>{s.label}</span>
+                      <em>{s.handle}</em>
+                    </a>
+                  ))}
+                </div>
               </div>
             </Reveal>
           </div>
@@ -93,8 +99,8 @@ export default function Contact() {
                 <span className="kicker">Ways To Give</span>
                 <h2>How You Can Help.</h2>
                 <p>
-                  Email us to arrange a bank transfer, to sponsor a batch of food packs, or to
-                  register as a volunteer for the next outreach.
+                  Donate online in under a minute, or email us to arrange a bank transfer, sponsor
+                  a batch of food packs, or register as a volunteer.
                 </p>
                 <p style={{ marginBottom: 26 }}>
                   For sponsorship and corporate partnerships, please include your organisation name
@@ -104,8 +110,7 @@ export default function Contact() {
                   <Link to="/donate" className="btn btn-chrome btn-lg">
                     <span className="ms">volunteer_activism</span> Donate Online
                   </Link>
-                  <a className="btn btn-outline btn-lg"
-                     href="mailto:unitednation.kolarputih@gmail.com?subject=I%20want%20to%20volunteer">
+                  <a className="btn btn-outline btn-lg" href={`mailto:${CONTACT.email}?subject=I%20want%20to%20volunteer`}>
                     <span className="ms">mail</span> Volunteer Instead
                   </a>
                 </div>
@@ -127,15 +132,25 @@ export default function Contact() {
             </p>
             <p style={{ marginTop: 22 }}>
               <strong style={{ color: 'var(--ink)' }}>Email</strong><br />
-              <a href="mailto:unitednation.kolarputih@gmail.com"
-                 style={{ color: 'var(--ink)', fontWeight: 600,
-                          borderBottom: '2px solid var(--silver-dim)' }}>
-                unitednation.kolarputih@gmail.com
+              <a href={`mailto:${CONTACT.email}`}
+                 style={{ color: 'var(--ink)', fontWeight: 600, borderBottom: '2px solid var(--silver-dim)' }}>
+                {CONTACT.email}
               </a>
             </p>
             <p style={{ marginTop: 18 }}>
               <strong style={{ color: 'var(--ink)' }}>Based in</strong><br />
-              Cyberjaya, Selangor, Malaysia
+              {CONTACT.locationFull}
+            </p>
+            <p style={{ marginTop: 18 }}>
+              <strong style={{ color: 'var(--ink)' }}>Follow us</strong><br />
+              <span className="contact-socials dark">
+                {SOCIALS.map((s) => (
+                  <a key={s.key} href={s.url} target="_blank" rel="noreferrer" className="contact-soc">
+                    <SocialIcon name={s.key} size={16} />
+                    <span>{s.handle}</span>
+                  </a>
+                ))}
+              </span>
             </p>
           </Reveal>
 
@@ -152,7 +167,7 @@ export default function Contact() {
               <div className="field">
                 <label htmlFor="subject">I Am Writing About</label>
                 <select id="subject" value={form.subject} onChange={set('subject')}>
-                  {SUBJECTS.map(s => <option key={s}>{s}</option>)}
+                  {SUBJECTS.map((s) => <option key={s}>{s}</option>)}
                 </select>
               </div>
               <div className="field">
@@ -166,7 +181,7 @@ export default function Contact() {
               {sent && (
                 <div className="ok-msg">
                   Your email app should now be open with the message ready to send. If nothing
-                  happened, email us directly at <b>unitednation.kolarputih@gmail.com</b>.
+                  happened, email us directly at <b>{CONTACT.email}</b>.
                 </div>
               )}
             </form>

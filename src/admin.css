@@ -371,3 +371,14 @@
   .collage-lead{grid-column:span 1}
   .ccard h3{padding-right:48px}
 }
+
+
+/* ================= CONTACT SOCIALS ================= */
+.contact-socials{display:grid;gap:10px}
+.contact-soc{display:flex;align-items:center;gap:9px;padding:9px 0;
+  color:#fff;font-size:15.5px;transition:color .2s ease}
+.contact-soc:hover{color:var(--silver-lit)}
+.contact-soc em{font-style:normal;color:var(--muted-dark);font-size:13.5px;margin-left:auto}
+.contact-socials.dark .contact-soc{color:var(--ink)}
+.contact-socials.dark .contact-soc:hover{color:var(--silver-dim)}
+.contact-socials.dark .contact-soc em{color:var(--muted)}
