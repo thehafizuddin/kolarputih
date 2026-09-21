@@ -90,8 +90,8 @@
   -webkit-background-clip:text;background-clip:text;
   color:transparent;-webkit-text-fill-color:transparent}
 .ad-tile-sub{display:block;font-size:13px;color:var(--muted-dark);margin-top:7px}
-.ad-tile.tone-ok::before{background:#6BBF7E}
-.ad-tile.tone-warn::before{background:#D9A441}
+.ad-tile.tone-ok::before{background:var(--chrome)}
+.ad-tile.tone-warn::before{background:var(--silver-dim)}
 
 /* --- rows / filters --- */
 .ad-rowbar{display:flex;align-items:center;justify-content:space-between;
