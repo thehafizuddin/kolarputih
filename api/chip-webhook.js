@@ -1,6 +1,9 @@
 import { query, one, json, readBody } from './_db.js'
 import { decryptSecret } from './_crypto.js'
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const isUuid = (v) => typeof v === 'string' && UUID_RE.test(v.trim())
+
 /**
  * POST /api/chip-webhook
  * CHIP calls this after a payment settles.
@@ -9,6 +12,9 @@ import { decryptSecret } from './_crypto.js'
  * is treated as UNTRUSTED. It is only used to learn WHICH purchase to look up.
  * The authoritative status always comes from a server-to-server GET against
  * CHIP using our own secret key. If verification fails, nothing is written.
+ *
+ * We always answer 200 for anything we understand (even if we ignore it), so
+ * CHIP does not retry an unrecoverable payload forever.
  */
 export default async function handler(req, res) {
   if (req.method !== 'POST') return json(res, 405, { error: 'method_not_allowed' })
@@ -16,24 +22,39 @@ export default async function handler(req, res) {
   let body
   try { body = await readBody(req) } catch { return json(res, 400, { error: 'bad_payload' }) }
 
-  const purchaseId = body?.id || body?.purchase_id
-  const ref = body?.reference
-  if (!purchaseId && !ref) return json(res, 400, { error: 'missing_identifier' })
+  const rawId = body?.id || body?.purchase_id
+  const rawRef = body?.reference
+
+  // Both identifiers are UUIDs in our schema. Reject anything that is not, so a
+  // malformed value can never reach the uuid column and raise a DB error.
+  const purchaseId = isUuid(rawId) ? rawId.trim() : null
+  const ref = isUuid(rawRef) ? rawRef.trim() : null
+
+  if (!purchaseId && !ref) {
+    // Understood the request but there is nothing usable to act on.
+    return json(res, 200, { ok: true, ignored: 'no_valid_identifier' })
+  }
 
   let settings
   try { settings = await one('select * from site_settings where id = 1') }
-  catch { return json(res, 500, { error: 'database_unavailable' }) }
+  catch (e) {
+    console.error('settings read failed:', e.message)
+    return json(res, 500, { error: 'database_unavailable' })
+  }
 
   if (!settings?.chip_enabled) return json(res, 200, { ok: true, ignored: 'disabled' })
 
   let secret
   try { secret = decryptSecret(settings.chip_secret_key) }
-  catch { return json(res, 500, { error: 'key_unreadable' }) }
+  catch (e) {
+    console.error('decrypt failed:', e.message)
+    return json(res, 500, { error: 'key_unreadable' })
+  }
   if (!secret) return json(res, 500, { error: 'key_missing' })
 
-  // ---- find our donation row -------------------------------------------
-  // Prefer the purchase id (unguessable and tied to us); fall back to the
-  // reference only to locate the row — never to obtain a status.
+  // ---- locate our donation row -----------------------------------------
+  // Prefer the purchase id (unguessable, tied to us); fall back to our own
+  // reference only to FIND the row — never to obtain a status.
   let donation = null
   try {
     if (purchaseId) {
@@ -49,14 +70,14 @@ export default async function handler(req, res) {
 
   if (!donation) return json(res, 200, { ok: true, ignored: 'unknown_donation' })
 
-  // ---- AUTHORITATIVE verification against CHIP -------------------------
-  // We look the purchase up with our own key. The callback body NEVER supplies
-  // the status. No verification -> no write.
+  // A purchase id must be on our own record before we trust anything.
   const lookupId = donation.chip_purchase_id
-  if (!lookupId) {
+  if (!isUuid(lookupId)) {
     return json(res, 200, { ok: true, ignored: 'no_purchase_on_record' })
   }
 
+  // ---- AUTHORITATIVE verification against CHIP --------------------------
+  // The callback body NEVER supplies the status. No verification -> no write.
   let verified = null
   try {
     const r = await fetch(`https://gate.chip-in.asia/api/v1/purchases/${lookupId}/`, {
@@ -68,18 +89,15 @@ export default async function handler(req, res) {
     console.error('verify fetch failed:', e.message)
   }
 
-  if (!verified) {
-    // Could not confirm with the gateway → do not touch the row.
-    return json(res, 200, { ok: true, ignored: 'unverified' })
-  }
+  if (!verified) return json(res, 200, { ok: true, ignored: 'unverified' })
 
-  // Cross-check: the purchase CHIP returned must belong to this donation.
+  // The purchase CHIP returned must belong to this donation.
   if (verified.reference && verified.reference !== String(donation.id)) {
     console.error('reference mismatch', verified.reference, donation.id)
     return json(res, 200, { ok: true, ignored: 'reference_mismatch' })
   }
 
-  // Cross-check the amount so a tampered checkout can't underpay a big pledge.
+  // Guard against a tampered checkout underpaying a larger pledge.
   const paidCents = verified.purchase?.total ?? verified.amount
   if (typeof paidCents === 'number' && paidCents < donation.amount_cents) {
     console.error('amount mismatch', paidCents, donation.amount_cents)
@@ -95,7 +113,7 @@ export default async function handler(req, res) {
 
   try {
     if (paid) {
-      // Never downgrade a paid row.
+      // Never downgrade a row that is already paid.
       await query(
         `update donations
             set status='paid',

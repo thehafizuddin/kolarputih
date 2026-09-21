@@ -171,7 +171,9 @@ export default async function handler(req, res) {
 
     // full campaign detail for the admin editor
     if (action === 'campaign-detail' && method === 'GET') {
-      const slug = (req.query?.slug || '').toString()
+      const slug = (req.query?.slug || '').toString().trim().slice(0, 80)
+      if (!slug) return json(res, 400, { error: 'slug_required' })
+      // id is uuid: cast the column so a non-uuid value can never error the query
       const c = await one('select * from campaigns where slug = $1 or id::text = $1', [slug])
       if (!c) return json(res, 404, { error: 'not_found' })
       return json(res, 200, { campaign: c })
